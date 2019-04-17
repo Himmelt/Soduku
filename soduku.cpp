@@ -24,14 +24,20 @@ void soduku::newGame(int hard) {
     clean();
     randLayout();
     checkSetGrid(0, 143);
-    cout << "----- finish matrix -----" << endl;
-    show();
-    cout << "-------------------------" << endl;
+    //show();
     puzzle puzzle(*this, hard);
     puzzle.build();
     cout << "------- the puzzle ------" << endl;
     puzzle.show();
-    cout << "-------------------------" << endl;
+    cout << "------ the solution -----" << endl;
+    auto start = std::chrono::high_resolution_clock::now();
+    puzzle.solve1();
+    auto stop = std::chrono::high_resolution_clock::now();
+    puzzle.show();
+    cout<<start.time_since_epoch().count()<<endl;
+    cout<<stop.time_since_epoch().count()<<endl;
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+    cout << "----- duration:" << duration.count()<< " ns -----" << endl;
 }
 
 bool soduku::checkSetGrid(int index, int last) {
@@ -88,4 +94,45 @@ list<int> soduku::randPossibles(int row, int col) {
 soduku::soduku(const soduku &soduku) {
     memcpy(layout, soduku.layout, 4 * sizeof(int));
     memcpy(cells, soduku.cells, 144 * sizeof(int));
+}
+
+void soduku::solve1() {
+    list<int> selects;
+    for (int grid = 0; grid < 144; grid++) {
+        int row = grid / 12, col = grid % 12;
+        if (layout[row / 3] == col / 3) continue;
+        if (cells[row][col] == 0) selects.push_back(grid);
+    }
+    list<int> selected(selects);
+    solvePuzzle1(selected);
+}
+
+bool soduku::solvePuzzle1(list<int> &selects) {
+    if (selects.empty()) return true;
+    int min = 9;
+    int best = -1;
+    list<int> possibles;
+    for (int grid : selects) {
+        int row = grid / 12, col = grid % 12;
+        list<int> pss = checkThePossibles(cells, row, col);
+        if (pss.size() < min) {
+            min = pss.size();
+            possibles = pss;
+            best = grid;
+        }
+        if (min == 1) break;
+    }
+    if (min > 0 && min < 9 && best >= 0) {
+        int row = best / 12, col = best % 12;
+        selects.remove(best);
+        for (int num : possibles) {
+            cells[row][col] = num;
+            if (solvePuzzle1(selects)) return true;
+            cells[row][col] = 0;
+        }
+        selects.push_back(best);
+    } else {
+        cout << "Invalid grids" << endl;
+    }
+    return false;
 }

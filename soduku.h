@@ -54,7 +54,7 @@ public:
 
     soduku();
 
-    soduku(const soduku & soduku);
+    soduku(const soduku &soduku);
 
     soduku(int cells[12][12], int layout[4]);
 
@@ -67,6 +67,10 @@ public:
     void randLayout();
 
     list<int> randPossibles(int row, int col);
+
+    void solve1();
+
+    bool solvePuzzle1(list<int> &selects);
 };
 
 #endif //SODUKU_SODUKU_H
