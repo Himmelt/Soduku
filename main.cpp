@@ -4,6 +4,6 @@ using namespace std;
 
 int main() {
     soduku soduku;
-    soduku.newGame(50);
+    soduku.newGame(60);
     return 0;
 }

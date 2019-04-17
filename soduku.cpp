@@ -24,20 +24,26 @@ void soduku::newGame(int hard) {
     clean();
     randLayout();
     checkSetGrid(0, 143);
-    //show();
-    puzzle puzzle(*this, hard);
-    puzzle.build();
+    cout << "------- the matrix ------" << endl;
+    show();
+    vector<puzzle> puzzles;
+    puzzles.emplace_back(*this, hard);
+    puzzles[0].build();
+    puzzles.emplace_back(puzzles[0]);
+    puzzles.emplace_back(puzzles[0]);
     cout << "------- the puzzle ------" << endl;
-    puzzle.show();
-    cout << "------ the solution -----" << endl;
-    auto start = std::chrono::high_resolution_clock::now();
-    puzzle.solve1();
-    auto stop = std::chrono::high_resolution_clock::now();
-    puzzle.show();
-    cout<<start.time_since_epoch().count()<<endl;
-    cout<<stop.time_since_epoch().count()<<endl;
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-    cout << "----- duration:" << duration.count()<< " ns -----" << endl;
+    puzzles[0].show();
+    for (int i = 0; i < 3; ++i) {
+        cout << "------ the solution method " << i << " -----" << endl;
+        auto start = std::chrono::high_resolution_clock::now();
+        puzzles[i].solve(i);
+        auto stop = std::chrono::high_resolution_clock::now();
+        puzzles[i].show();
+        cout << start.time_since_epoch().count() << endl;
+        cout << stop.time_since_epoch().count() << endl;
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+        cout << "----- duration:" << i << " " << duration.count() << " ns -----" << endl;
+    }
 }
 
 bool soduku::checkSetGrid(int index, int last) {
@@ -96,7 +102,7 @@ soduku::soduku(const soduku &soduku) {
     memcpy(cells, soduku.cells, 144 * sizeof(int));
 }
 
-void soduku::solve1() {
+void soduku::solve(int method) {
     list<int> selects;
     for (int grid = 0; grid < 144; grid++) {
         int row = grid / 12, col = grid % 12;
@@ -104,10 +110,57 @@ void soduku::solve1() {
         if (cells[row][col] == 0) selects.push_back(grid);
     }
     list<int> selected(selects);
-    solvePuzzle1(selected);
+    if (method == 1) solvePuzzle1(selected);
+    else if (method == 2)solvePuzzle2(selected);
+    else solvePuzzle0(selected);
+}
+
+bool soduku::solvePuzzle0(list<int> &selects) {
+    if (selects.empty()) return true;
+    int grid = selects.back();
+    int row = grid / 12, col = grid % 12;
+    list<int> possibles = checkThePossibles(cells, row, col);
+    selects.remove(grid);
+    for (int num : possibles) {
+        cells[row][col] = num;
+        if (solvePuzzle0(selects)) return true;
+        cells[row][col] = 0;
+    }
+    selects.push_back(grid);
+    return false;
 }
 
 bool soduku::solvePuzzle1(list<int> &selects) {
+    if (selects.empty()) return true;
+    int min = 9;
+    int best = -1;
+    list<int> possibles;
+    for (int grid : selects) {
+        int row = grid / 12, col = grid % 12;
+        list<int> pss = checkThePossibles(cells, row, col);
+        if (pss.size() < min) {
+            min = pss.size();
+            possibles = pss;
+            best = grid;
+        }
+        if (min == 1) break;
+    }
+    if (min > 0 && min < 9 && best >= 0) {
+        int row = best / 12, col = best % 12;
+        selects.remove(best);
+        for (int num : possibles) {
+            cells[row][col] = num;
+            if (solvePuzzle1(selects)) return true;
+            cells[row][col] = 0;
+        }
+        selects.push_back(best);
+    } else {
+        cout << "Invalid grids" << endl;
+    }
+    return false;
+}
+
+bool soduku::solvePuzzle2(list<int> &selects) {
     if (selects.empty()) return true;
     int min = 9;
     int best = -1;

@@ -68,9 +68,13 @@ public:
 
     list<int> randPossibles(int row, int col);
 
-    void solve1();
+    void solve(int method);
+
+    bool solvePuzzle0(list<int> &selects);
 
     bool solvePuzzle1(list<int> &selects);
+
+    bool solvePuzzle2(list<int> &selects);
 };
 
 #endif //SODUKU_SODUKU_H
