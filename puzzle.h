@@ -3,7 +3,7 @@
 
 #include "soduku.h"
 
-#define MAX_HARD 50
+#define MAX_HARD 70
 
 using namespace std;
 

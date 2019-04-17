@@ -67,6 +67,8 @@ int puzzle::checkRepeat() {
     // 置零布局
     int theCells[12][12];
     memcpy(theCells, cells, 144 * sizeof(int));
+    cout<<"-----------------checkRepeat--------------"<<endl;
+    show();
     for (int num : selects) theCells[num / 12][num % 12] = 0;
     // 回溯
     list<int> selected(selects);
@@ -83,12 +85,12 @@ int puzzle::checkSolution(int theCells[12][12], list<int> &selected) {
         selected.remove(grid);
         int count = 0;
         for (int num : possibles) {
-            cells[row][col] = num;
+            theCells[row][col] = num;
             int code = checkSolution(theCells, selected);
             if (code == 0)count++;
             else if (code >= 1 && code <= 144) return code;
             if (count >= 2) return grid + 1;
-            cells[row][col] = 0;
+            theCells[row][col] = 0;
         }
         selected.push_back(grid);
         if (count == 1)return 0;
