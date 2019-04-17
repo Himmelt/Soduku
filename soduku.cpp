@@ -189,3 +189,45 @@ bool soduku::solvePuzzle2(list<int> &selects) {
     }
     return false;
 }
+
+bool soduku::scanLocked(list<int> &selects) {
+    int best = 0;
+    int max = 0;
+    for (int i = 1; i <= 9; i++) {
+        int count = checkNum(i);
+        if (count > max && count < 9) {
+            max = count;
+            best = i;
+        }
+        if (max == 8)break;
+    }
+    int theCells[12][12];
+    memcpy(theCells, cells, 144 * sizeof(int));
+    for (int i = 0; i < 12; ++i) {
+        for (int j = 0; j < 12; ++j) {
+            if (theCells[i][j] == best) {
+                for (int k = 0; k < 12; ++k) {
+                    theCells[i][k] = best;
+                    theCells[k][j] = best;
+                }
+                int r2 = i / 3 * 3;
+                int c2 = j / 3 * 3;
+                for (int l = 0; l < 3; l++) for (int m = 0; m < 3; m++) theCells[r2 + l][c2 + m] = best;
+            }
+        }
+    }
+    for (int i = 0; i < 12; ++i) {
+        for (int j = 0; j < 12; ++j) {
+            if (layout[i / 3] == j / 3)continue;
+            if (theCells[i][j] == 0) {
+
+            }
+        }
+    }
+}
+
+int soduku::checkNum(int target) {
+    int amount = 0;
+    for (auto &cell:cells) for (int num:cell) if (num == target)amount++;
+    return amount;
+}

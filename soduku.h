@@ -75,6 +75,10 @@ public:
     bool solvePuzzle1(list<int> &selects);
 
     bool solvePuzzle2(list<int> &selects);
+
+    bool scanLocked(list<int> &selects);
+
+    int checkNum(int num);
 };
 
 #endif //SODUKU_SODUKU_H
