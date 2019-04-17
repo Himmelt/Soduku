@@ -3,4 +3,4 @@ project(Soduku)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Soduku main.cpp Soduku.cpp Soduku.h Puzzle.cpp Puzzle.h)
+add_executable(Soduku main.cpp soduku.cpp soduku.h puzzle.cpp puzzle.h)
