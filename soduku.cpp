@@ -24,12 +24,14 @@ void soduku::newGame(int hard) {
     clean();
     randLayout();
     checkSetGrid(0, 143);
-    cout << "---------" << endl;
+    cout << "----- finish matrix -----" << endl;
     show();
+    cout << "-------------------------" << endl;
     puzzle puzzle(*this, hard);
     puzzle.build();
-    cout << "---------" << endl;
+    cout << "------- the puzzle ------" << endl;
     puzzle.show();
+    cout << "-------------------------" << endl;
 }
 
 bool soduku::checkSetGrid(int index, int last) {

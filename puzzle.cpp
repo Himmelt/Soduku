@@ -9,13 +9,10 @@ puzzle::puzzle(const soduku &soduku, int hard) {
 
 bool puzzle::build() {
     if (randPuzzle()) {
-        for (int num:selects) {
-            cout << "size:" << selects.size() << endl;
-            cells[num / 12][num % 12] = 0;
-        }
+        for (int num:selects) cells[num / 12][num % 12] = 0;
         return true;
     } else {
-        cout << "no valid puzzle !" << endl;
+        cout << "NO valid puzzle !" << endl;
         return false;
     }
 }
@@ -53,22 +50,20 @@ bool puzzle::randPuzzle() {
     int count = 0;
     while ((repeat = checkRepeat()) != 0 && count < 100) {
         if (repeat < 0) {
-            cout << "NO solution !" << endl;
+            cout << "ERROR !! NO solution !" << endl;
             return false;
         }
         cout << "repeat:" << repeat - 1 << endl;
         selectNext(repeat - 1);
         count++;
     }
-    return count <= 100;
+    return repeat == 0;
 }
 
 int puzzle::checkRepeat() {
     // 置零布局
     int theCells[12][12];
     memcpy(theCells, cells, 144 * sizeof(int));
-    cout<<"-----------------checkRepeat--------------"<<endl;
-    show();
     for (int num : selects) theCells[num / 12][num % 12] = 0;
     // 回溯
     list<int> selected(selects);
