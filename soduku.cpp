@@ -201,21 +201,41 @@ bool soduku::scanLocked(list<int> &selects) {
         }
         if (max == 8)break;
     }
+
     int theCells[12][12];
     memcpy(theCells, cells, 144 * sizeof(int));
+
+    list<int> list = sequenceList(0, 143);
+
     for (int i = 0; i < 12; ++i) {
         for (int j = 0; j < 12; ++j) {
+            if (layout[i / 3] == j / 3) {
+                list.remove(12 * i + j);
+                continue;
+            }
             if (theCells[i][j] == best) {
                 for (int k = 0; k < 12; ++k) {
-                    theCells[i][k] = best;
-                    theCells[k][j] = best;
+                    list.remove(12 * i + k);
+                    list.remove(12 * k + j);
                 }
                 int r2 = i / 3 * 3;
                 int c2 = j / 3 * 3;
-                for (int l = 0; l < 3; l++) for (int m = 0; m < 3; m++) theCells[r2 + l][c2 + m] = best;
+                for (int l = 0; l < 3; l++)
+                    for (int m = 0; m < 3; m++) {
+                        list.remove(12 * (r2 + l) + c2 + m);
+                    }
+            } else if (theCells[i][j] != 0) {
+                list.remove(12 * i + j);
             }
         }
     }
+
+    for (int grid:list) {
+        int row = grid / 12, col = grid % 12;
+        // 行唯一 、列唯一、宫唯一
+
+    }
+
     for (int i = 0; i < 12; ++i) {
         for (int j = 0; j < 12; ++j) {
             if (layout[i / 3] == j / 3)continue;
@@ -224,6 +244,7 @@ bool soduku::scanLocked(list<int> &selects) {
             }
         }
     }
+    return false;
 }
 
 int soduku::checkNum(int target) {

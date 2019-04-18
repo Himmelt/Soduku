@@ -24,11 +24,23 @@ protected:
         return temp;
     }
 
+    const static vector<int> sequenceQueue(int min, int max) {
+        vector<int> temp;
+        for (int i = min; i <= max; i++) temp.push_back(i);
+        return temp;
+    }
+
     const static list<int> randList(int min, int max) {
         vector<int> temp = randQueue(min, max);
         list<int> list;
         list.assign(temp.begin(), temp.end());
         return list;
+    }
+
+    const static list<int> sequenceList(int min, int max) {
+        list<int> temp;
+        for (int i = min; i <= max; i++) temp.push_back(i);
+        return temp;
     }
 
     const static list<int> checkThePossibles(int theCells[12][12], int row, int col) {
