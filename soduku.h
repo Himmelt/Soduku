@@ -88,9 +88,13 @@ public:
 
     bool solvePuzzle2(list<int> &selects);
 
-    bool scanLocked(list<int> &selects);
+    int cycleBestLock();
+
+    bool scanLocked(int best);
 
     int checkNum(int num);
+
+    const static bool testAlone(int grid, const list<int> &list);
 };
 
 #endif //SODUKU_SODUKU_H

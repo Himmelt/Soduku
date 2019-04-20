@@ -161,50 +161,33 @@ bool soduku::solvePuzzle1(list<int> &selects) {
 }
 
 bool soduku::solvePuzzle2(list<int> &selects) {
-    if (selects.empty()) return true;
-    int min = 9;
-    int best = -1;
-    list<int> possibles;
-    for (int grid : selects) {
-        int row = grid / 12, col = grid % 12;
-        list<int> pss = checkThePossibles(cells, row, col);
-        if (pss.size() < min) {
-            min = pss.size();
-            possibles = pss;
-            best = grid;
-        }
-        if (min == 1) break;
+    for (int i = 0; i < 9; ++i) {
+        int best = cycleBestLock();
+        if (best != 0)scanLocked(best);
     }
-    if (min > 0 && min < 9 && best >= 0) {
-        int row = best / 12, col = best % 12;
-        selects.remove(best);
-        for (int num : possibles) {
-            cells[row][col] = num;
-            if (solvePuzzle1(selects)) return true;
-            cells[row][col] = 0;
-        }
-        selects.push_back(best);
-    } else {
-        cout << "Invalid grids" << endl;
+    for (auto it = selects.begin(); it != selects.end();) {
+        if (cells[*it / 12][*it % 12] != 0) {
+            it = selects.erase(it);
+        } else it++;
     }
-    return false;
+    return solvePuzzle1(selects);
 }
 
-bool soduku::scanLocked(list<int> &selects) {
+int soduku::cycleBestLock() {
     int best = 0;
     int max = 0;
     for (int i = 1; i <= 9; i++) {
         int count = checkNum(i);
-        if (count > max && count < 9) {
+        if (count > max && count < 12) {
             max = count;
             best = i;
         }
         if (max == 8)break;
     }
+    return best;
+}
 
-    int theCells[12][12];
-    memcpy(theCells, cells, 144 * sizeof(int));
-
+bool soduku::scanLocked(int best) {
     list<int> list = sequenceList(0, 143);
 
     for (int i = 0; i < 12; ++i) {
@@ -213,42 +196,49 @@ bool soduku::scanLocked(list<int> &selects) {
                 list.remove(12 * i + j);
                 continue;
             }
-            if (theCells[i][j] == best) {
+            if (cells[i][j] == best) {
                 for (int k = 0; k < 12; ++k) {
                     list.remove(12 * i + k);
                     list.remove(12 * k + j);
                 }
                 int r2 = i / 3 * 3;
                 int c2 = j / 3 * 3;
-                for (int l = 0; l < 3; l++)
-                    for (int m = 0; m < 3; m++) {
-                        list.remove(12 * (r2 + l) + c2 + m);
-                    }
-            } else if (theCells[i][j] != 0) {
+                for (int l = 0; l < 3; l++) for (int m = 0; m < 3; m++) list.remove(12 * (r2 + l) + c2 + m);
+            } else if (cells[i][j] != 0) {
                 list.remove(12 * i + j);
             }
         }
     }
 
+    int amount = 0;
+    // 行唯一 || 列唯一 || 宫唯一
     for (int grid:list) {
-        int row = grid / 12, col = grid % 12;
-        // 行唯一 、列唯一、宫唯一
-
-    }
-
-    for (int i = 0; i < 12; ++i) {
-        for (int j = 0; j < 12; ++j) {
-            if (layout[i / 3] == j / 3)continue;
-            if (theCells[i][j] == 0) {
-
-            }
+        if (testAlone(grid, list)) {
+            cells[grid / 12][grid % 12] = best;
+            amount++;
         }
     }
-    return false;
+
+    return amount > 0;
 }
 
 int soduku::checkNum(int target) {
     int amount = 0;
     for (auto &cell:cells) for (int num:cell) if (num == target)amount++;
     return amount;
+}
+
+const bool soduku::testAlone(int grid, const list<int> &list) {
+    int theRow = grid / 12, theCol = grid % 12;
+    int rowHead = theRow / 3 * 3;
+    int colHead = theCol / 3 * 3;
+    bool sameRow = false, sameCol = false, sameMatrix = false;
+    for (int num:list) {
+        if (grid == num)continue;
+        int row = num / 12, col = num % 12;
+        if (theRow == row)sameRow = true;
+        if (theCol == col)sameCol = true;
+        if (row >= rowHead && row < rowHead + 3 && col >= colHead && col < colHead + 3)sameMatrix = true;
+    }
+    return !sameRow || !sameCol || !sameMatrix;
 }
