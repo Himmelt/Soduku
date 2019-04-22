@@ -12,15 +12,15 @@ bool puzzle::build() {
         for (int num:selects) cells[num / 12][num % 12] = 0;
         return true;
     } else {
-        cout << "NO valid puzzle !" << endl;
+        cout << "无效的题目!" << endl;
         return false;
     }
 }
 
-void puzzle::randSelects() {
+bool puzzle::randSelects() {
     if (hard > MAX_HARD || hard > 143) {
-        cout << "Too many empty grids !" << endl;
-        return;
+        cout << "空格数量太多，超过 " << MAX_HARD << endl;
+        return false;
     }
     selects.clear();
     list<int> list = randList(0, 143);
@@ -28,8 +28,9 @@ void puzzle::randSelects() {
         int row = num / 12, col = num % 12;
         if (layout[row / 3] == col / 3) continue;
         selects.push_back(num);
-        if (selects.size() >= hard)return;
+        if (selects.size() >= hard)return true;
     }
+    return false;
 }
 
 void puzzle::selectNext(int repeat) {
@@ -45,19 +46,21 @@ void puzzle::selectNext(int repeat) {
 }
 
 bool puzzle::randPuzzle() {
-    randSelects();
-    int repeat;
-    int count = 0;
-    while ((repeat = checkRepeat()) != 0 && count < 100) {
-        if (repeat < 0) {
-            cout << "ERROR !! NO solution !" << endl;
-            return false;
+    if (randSelects()) {
+        int repeat;
+        int count = 0;
+        while ((repeat = checkRepeat()) != 0 && count < 100) {
+            if (repeat < 0) {
+                cout << "ERROR !! NO solution !" << endl;
+                return false;
+            }
+            cout << "repeat:" << repeat - 1 << endl;
+            selectNext(repeat - 1);
+            count++;
         }
-        cout << "repeat:" << repeat - 1 << endl;
-        selectNext(repeat - 1);
-        count++;
+        return repeat == 0;
     }
-    return repeat == 0;
+    return false;
 }
 
 int puzzle::checkRepeat() {

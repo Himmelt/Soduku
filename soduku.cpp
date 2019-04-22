@@ -24,25 +24,26 @@ void soduku::newGame(int hard) {
     clean();
     randLayout();
     checkSetGrid(0, 143);
-    cout << "------- the matrix ------" << endl;
+    cout << "------- 终盘 ------" << endl;
     show();
     vector<puzzle> puzzles;
     puzzles.emplace_back(*this, hard);
-    puzzles[0].build();
-    puzzles.emplace_back(puzzles[0]);
-    puzzles.emplace_back(puzzles[0]);
-    cout << "------- the puzzle ------" << endl;
-    puzzles[0].show();
-    for (int i = 0; i < 3; ++i) {
-        cout << "------ the solution method " << i << " -----" << endl;
-        auto start = std::chrono::high_resolution_clock::now();
-        puzzles[i].solve(i);
-        auto stop = std::chrono::high_resolution_clock::now();
-        puzzles[i].show();
-        cout << start.time_since_epoch().count() << endl;
-        cout << stop.time_since_epoch().count() << endl;
-        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        cout << "----- duration:" << i << " " << duration.count() << " ns -----" << endl;
+    if (puzzles[0].build()){
+        puzzles.emplace_back(puzzles[0]);
+        puzzles.emplace_back(puzzles[0]);
+        cout << "------- 题目 ------" << endl;
+        puzzles[0].show();
+        for (int i = 0; i < 3; ++i) {
+            cout << "------ 方法 " << i << " 解-----" << endl;
+            auto start = std::chrono::high_resolution_clock::now();
+            puzzles[i].solve(i);
+            auto stop = std::chrono::high_resolution_clock::now();
+            puzzles[i].show();
+            cout <<"开始时间: "<< start.time_since_epoch().count() << endl;
+            cout << "结束时间: "<<stop.time_since_epoch().count() << endl;
+            auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            cout << "----- 方法 " << i << " 历时: " << duration.count() << " 纳秒 -----" << endl;
+        }
     }
 }
 
@@ -155,7 +156,7 @@ bool soduku::solvePuzzle1(list<int> &selects) {
         }
         selects.push_back(best);
     } else {
-        cout << "Invalid grids" << endl;
+        cout << "无效局!!!" << endl;
     }
     return false;
 }

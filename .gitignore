@@ -1,3 +1,6 @@
 /.idea
+.idea
+.idea/
 *build*
 *.exe
+!build.bat

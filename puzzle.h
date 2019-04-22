@@ -12,7 +12,7 @@ private:
     int hard = 0;
     list<int> selects;
 
-    void randSelects();
+    bool randSelects();
 
     void selectNext(int repeat);
 
