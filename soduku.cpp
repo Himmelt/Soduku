@@ -8,8 +8,11 @@ const list<int> soduku::one2nine() {
 void soduku::show() {
     for (int i = 0; i < 12; ++i) {
         for (int j = 0; j < 12; ++j) {
+            // 检查格子是否处于灰色区域
             if (layout[i / 3] == j / 3) cout << "+ ";
-            else cout << cells[i][j] << " ";
+            else if(cells[i][j]==0){
+                cout<<"? ";
+            }else cout << cells[i][j] << " ";
         }
         cout << endl;
     }
@@ -20,13 +23,14 @@ soduku::soduku(int cells[12][12], int layout[4]) {
     memcpy(this->cells, cells, 144 * sizeof(int));
 }
 
+// 新建游戏
 void soduku::newGame(int hard) {
-    clean();
-    randLayout();
-    checkSetGrid(0, 143);
+    clean();//清除格子里的数字
+    randLayout();//生成一个布局
+    checkSetGrid(0, 143);//方法5
     cout << "------- 终盘 ------" << endl;
-    show();
-    vector<puzzle> puzzles;
+    show();//显示
+    vector<puzzle> puzzles;//数组
     puzzles.emplace_back(*this, hard);
     if (puzzles[0].build()){
         puzzles.emplace_back(puzzles[0]);
@@ -162,16 +166,17 @@ bool soduku::solvePuzzle1(list<int> &selects) {
 }
 
 bool soduku::solvePuzzle2(list<int> &selects) {
+    // 摒除法
     for (int i = 0; i < 9; ++i) {
-        int best = cycleBestLock();
-        if (best != 0)scanLocked(best);
+        int best = cycleBestLock();// 选择数量最多的数字进行摒除
+        if (best != 0)scanLocked(best);//排除不可能的位置
     }
     for (auto it = selects.begin(); it != selects.end();) {
         if (cells[*it / 12][*it % 12] != 0) {
-            it = selects.erase(it);
+            it = selects.erase(it);// 填上剩余的空格
         } else it++;
     }
-    return solvePuzzle1(selects);
+    return solvePuzzle1(selects);// 最小候选数回溯
 }
 
 int soduku::cycleBestLock() {
